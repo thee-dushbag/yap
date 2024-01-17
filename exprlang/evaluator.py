@@ -39,7 +39,7 @@ class Evaluator(Visitor):
     def accept_slash(self, expr: Slash) -> ty.Any:
         left, right = self._binlr(expr)
         if right == 0:
-            raise Exception(
+            raise ZeroDivisionError(
                 f"Zero division error '{left} / 0' at column {expr.operator.column}"
             )
         return left / right

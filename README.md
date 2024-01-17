@@ -8,11 +8,11 @@ This will also show the advantages of compilation over interpretation and hopefu
 
 # Progress
 
-- [ ] Implement a basic Lexer.
-- [ ] Implement a basic Parser.
-- [ ] Implement a basic evaluator.
-- [ ] Design a simple VM with a few instructions.
-- [ ] Implement a simple AST Compiler.
+- [x] Implement a basic Lexer.
+- [x] Implement a basic Parser.
+- [x] Implement a basic evaluator.
+- [x] Design a simple VM with a few instructions.
+- [x] Implement a simple AST Compiler.
 - [ ] Add more to this list.
 
 # Hopes for the project.

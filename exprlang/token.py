@@ -1,7 +1,7 @@
 import enum
 
 
-class TokenType(enum.IntEnum):
+class TokenType(enum.StrEnum):
     NUMBER = enum.auto()
     LEFT = enum.auto()
     RIGHT = enum.auto()

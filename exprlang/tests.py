@@ -1,8 +1,11 @@
+from .instructions import Instruction
 from .token import Token, TokenType
 from .evaluator import Evaluator
+from .compiler import Compiler
 from .parser import Parser
 from .lexer import Lexer
 from . import nodes
+from .vm import VirtualMachine
 
 
 def test_lexer():
@@ -89,3 +92,71 @@ def test_evaluator():
     for expr, ans in exprs:
         ast = _genast(expr)
         assert evaluator.eval(ast) == ans
+
+
+def test_compiler():
+    expr = "50 - +90 / 7 * 23 ^ (8 + -6)"
+    deps = Lexer(), Parser()
+
+    def _genast(expr: str) -> nodes.Expression:
+        return deps[1].parse(deps[0].scan(expr))
+
+    def _genconst(const: str):
+        return [len(const), *map(ord, const)]
+
+    consts = []
+    for const in map(_genconst, ("0", "50", "90", "7", "23", "8", "6")):
+        consts.extend(const)
+    consts.append(Instruction.EOS)
+
+    program = [
+        Instruction.LOAD_CONST, 1,
+        Instruction.LOAD_CONST, 0,
+        Instruction.LOAD_CONST, 2,
+        Instruction.ADD,
+        Instruction.LOAD_CONST, 3,
+        Instruction.DIVIDE,
+        Instruction.LOAD_CONST, 4,
+        Instruction.LOAD_CONST, 5,
+        Instruction.LOAD_CONST, 0,
+        Instruction.LOAD_CONST, 6,
+        Instruction.SUBTRACT,
+        Instruction.ADD,
+        Instruction.POWER,
+        Instruction.MULTIPLY,
+        Instruction.SUBTRACT,
+        Instruction.EOS,
+    ]
+
+    bytecode = bytes([*consts, *program])
+    compiler = Compiler()
+    ast = _genast(expr)
+    gen_bytecode = compiler.compile(ast)
+    assert gen_bytecode == bytecode
+
+
+def test_virtual_machine():
+    deps = Lexer(), Parser()
+
+    def _genast(expr: str) -> nodes.Expression:
+        return deps[1].parse(deps[0].scan(expr))
+
+    exprs = (
+        ("-3", -3),
+        ("3 + 5", 8),
+        ("4 * 7", 28),
+        ("4 * 7 + 3", 31),
+        ("1024 ^ 0.1", 2),
+        ("2 ^ 2 ^ 2", 16),
+        ("5 ^ 2 ^ 0.5", 5),
+        ("9 / 10 / 10", 0.09),
+        ("11111111 ^ 2", 123456787654321),
+        ("50 - +90 / 7 * 23 ^ (8 + -6)", -47260 / 7),
+    )
+
+    vm = VirtualMachine()
+    compiler = Compiler()
+    for expr, ans in exprs:
+        ast = _genast(expr)
+        bytecode = compiler.compile(ast)
+        assert vm.execute(bytecode) == ans
