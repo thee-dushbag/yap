@@ -1,5 +1,22 @@
+from exprlang.nodes import Group, Minus, Number, Plus, Power, Slash, Star, UMinus, UPlus
 from .instructions import Instruction
 from .exc import UnknownInstruction
+from collections import defaultdict
+from .nodes import (
+    Expression,
+    Visitor,
+    Number,
+    UMinus,
+    Minus,
+    Slash,
+    Power,
+    UPlus,
+    Group,
+    Plus,
+    Star,
+    Binary,
+    Unary,
+)
 
 
 class ByteCodePrinter:
@@ -89,3 +106,75 @@ class ByteCodePrinter:
         indent = " " if indent is None else indent
         instructions = self.join(indent)
         print(instructions)
+
+
+class ASTPrinter(Visitor):
+    def __init__(self) -> None:
+        self._column = 0
+        self._lines = defaultdict(lambda: "")
+        self._line = 0
+
+    @property
+    def indent(self):
+        return " " * self._column
+
+    def advance(self, size: int = 1):
+        self._column += size
+
+    def accept_number(self, expr: Number):
+        number = self.indent + expr.token.lexeme
+        self.advance(len(expr.token.lexeme))
+        self.addline(number)
+
+    def addline(self, string: str):
+        current = self._lines[self._line]
+        current += string[len(current) :]
+        self._lines[self._line] = current
+
+    def _accept_binary(self, expr: Binary):
+        head = self.indent + expr.operator.lexeme
+        self.addline(head)
+        self._line += 1
+        expr.left.accept(self)
+        self.advance()
+        expr.right.accept(self)
+        self._line -= 1
+
+    def _accept_unary(self, expr: Unary):
+        head = self.indent + expr.operator.lexeme
+        self.addline(head)
+        self._line += 1
+        expr.right.accept(self)
+        self._line -= 1
+
+    def accept_plus(self, expr: Plus):
+        return self._accept_binary(expr)
+
+    def accept_minus(self, expr: Minus):
+        return self._accept_binary(expr)
+
+    def accept_power(self, expr: Power):
+        return self._accept_binary(expr)
+
+    def accept_slash(self, expr: Slash):
+        return self._accept_binary(expr)
+
+    def accept_star(self, expr: Star):
+        return self._accept_binary(expr)
+
+    def accept_group(self, expr: Group):
+        return expr.right.accept(self)
+
+    def accept_uminus(self, expr: UMinus):
+        return self._accept_unary(expr)
+
+    def accept_uplus(self, expr: UPlus):
+        return self._accept_unary(expr)
+
+    reset = __init__
+
+    def print(self, root: Expression):
+        self.reset()
+        root.accept(self)
+        for line in sorted(self._lines):
+            print(self._lines[line])

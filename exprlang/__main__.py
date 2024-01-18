@@ -1,5 +1,5 @@
+from .printer import ByteCodePrinter, ASTPrinter
 from .exc import LexerError, ParserError
-from .printer import ByteCodePrinter
 from .evaluator import Evaluator
 from .vm import VirtualMachine
 from .compiler import Compiler
@@ -7,6 +7,7 @@ from .parser import Parser
 from .lexer import Lexer
 
 bytecodeprinter = ByteCodePrinter()
+astprinter = ASTPrinter()
 evaluator = Evaluator()
 vm = VirtualMachine()
 compiler = Compiler()
@@ -22,6 +23,9 @@ def _run(expr: str):
             print(f"  {token!s}")
         print()
         ast = parser.parse(tokens)
+        print("AST:")
+        astprinter.print(ast)
+        print()
         bytecode = compiler.compile(ast)
         print(f"BYTECODE: {bytecode!r}")
         print("INSTRUCTIONS:")
@@ -40,6 +44,7 @@ def _run(expr: str):
 
 
 def main():
+    print("Enter exit, quit, bye, q or press ctrl-c to exit.")
     while True:
         expr = input("> ")
         if expr in ("exit", "q", "quit", "bye"):

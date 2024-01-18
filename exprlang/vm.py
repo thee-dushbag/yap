@@ -4,13 +4,13 @@ from .exc import UnknownInstruction
 
 class VirtualMachine:
     def __init__(self, bytecode: list[int] | bytes | None = None) -> None:
-        self._stack = []
+        self._bytecode = bytecode or [Instruction.EOS, Instruction.EOS]
         self._constants: list[int | float] = []
-        self._bytecode = bytecode or b""
         self._stop = len(self._bytecode)
+        self._current = 0
+        self._stack = []
         self.push = self._stack.append
         self.pop = self._stack.pop
-        self._current = 0
 
     reset = __init__
 
@@ -18,7 +18,8 @@ class VirtualMachine:
         self.reset(bytecode)
         self._load_constants()
         self._execute()
-        return self.pop()
+        if self._stack:
+            return self.pop()
 
     def _load_constants(self):
         while self.peek() != Instruction.EOS:

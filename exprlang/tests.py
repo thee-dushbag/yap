@@ -2,10 +2,10 @@ from .instructions import Instruction
 from .token import Token, TokenType
 from .evaluator import Evaluator
 from .compiler import Compiler
+from .vm import VirtualMachine
 from .parser import Parser
 from .lexer import Lexer
 from . import nodes
-from .vm import VirtualMachine
 
 
 def test_lexer():
