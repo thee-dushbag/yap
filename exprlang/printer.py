@@ -110,8 +110,8 @@ class ByteCodePrinter:
 
 class ASTPrinter(Visitor):
     def __init__(self) -> None:
-        self._column = 0
         self._lines = defaultdict(lambda: "")
+        self._column = 0
         self._line = 0
 
     @property
@@ -173,8 +173,11 @@ class ASTPrinter(Visitor):
 
     reset = __init__
 
-    def print(self, root: Expression):
+    def join(self, root: Expression):
         self.reset()
         root.accept(self)
-        for line in sorted(self._lines):
-            print(self._lines[line])
+        lines = (self._lines[l] for l in sorted(self._lines))
+        return "\n".join(lines)
+
+    def print(self, root: Expression):
+        print(self.join(root))

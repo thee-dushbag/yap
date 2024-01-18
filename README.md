@@ -16,7 +16,7 @@ This will also show the advantages of compilation over interpretation and hopefu
 - [x] Add a simple informative and usable REPR.
 - [x] Add an instruction printer.
 - [x] Add an AST printer.
-- [ ] Add a linter/expression formatter.
+- [x] Add an expression formatter.
 - [ ] Add more to this list.
 
 # Hopes for the project.
@@ -38,9 +38,10 @@ from exprlang.main import ExprEvaluator
 
 expreval = ExprEvaluator()
 
-expr = "5 * 3 + 4 / 2 - 10"
-print(f"Expression: {expr}")
-# Expression: 5 * 3 + 4 / 2 - 10
+expr = "5*3+4/2-10"
+linted_expr = expreval.format(expr)
+print(f"Expression: {linted_expr!r}")
+# Expression: '5 * 3 + 4 / 2 - 10'
 
 result = expreval.eval(expr)
 print(f"EvalResult: {result}")
@@ -48,12 +49,14 @@ print(f"EvalResult: {result}")
 
 bytecode = expreval.compile(expr)
 print(f"ByteCode: {bytecode}")
-# ByteCode: b'\x010\x015\x013\x014\x012\x0210\x00\x06\x01\x06\x02\x04\x06\x03\x06\x04\x03\x01\x06\x05\x05\x00'
+# ByteCode: b'\x010\x015\x013\x014\x012\x0210\x00\x06\x01\x06
+#             \x02\x04\x06\x03\x06\x04\x03\x01\x06\x05\x05\x00'
 
 vm_result = expreval.exec(bytecode)
 print(f"VmResult: {vm_result}")
 # VmResult: 7.0
 
+# There should be no errors here.
 assert vm_result == result
 ```
 

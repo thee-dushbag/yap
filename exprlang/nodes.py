@@ -39,7 +39,7 @@ class Expression(ty.Protocol):
     def accept(self, visitor) -> ty.Any:
         ...
 
-    def __eq__(self, other):
+    def __eq__(self, other: ty.Any) -> bool:
         ...
 
 
@@ -49,13 +49,13 @@ class Binary:
         self.operator = operator
         self.right = right
 
-    def __eq__(self, expr):
-        if isinstance(expr, Binary):
-            return (
-                self.left == expr.left
-                and self.operator == expr.operator
-                and self.right == expr.right
-            )
+    def __eq__(self, expr: ty.Any) -> bool:
+        return (
+            isinstance(expr, Binary)
+            and self.left == expr.left
+            and self.operator == expr.operator
+            and self.right == expr.right
+        )
 
 
 class Unary:
@@ -63,9 +63,12 @@ class Unary:
         self.operator = operator
         self.right = right
 
-    def __eq__(self, expr):
-        if isinstance(expr, Unary):
-            return self.operator == expr.operator and self.right == expr.right
+    def __eq__(self, expr) -> bool:
+        return (
+            isinstance(expr, Unary)
+            and self.operator == expr.operator
+            and self.right == expr.right
+        )
 
 
 class Plus(Binary, Expression):
@@ -116,5 +119,4 @@ class Number(Expression):
         return visitor.accept_number(self)
 
     def __eq__(self, numb):
-        if isinstance(numb, Number):
-            return self.token == numb.token
+        return isinstance(numb, Number) and self.token == numb.token

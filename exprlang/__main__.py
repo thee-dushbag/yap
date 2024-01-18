@@ -1,5 +1,6 @@
 from .printer import ByteCodePrinter, ASTPrinter
 from .exc import LexerError, ParserError
+from .formatter import Formatter
 from .evaluator import Evaluator
 from .vm import VirtualMachine
 from .compiler import Compiler
@@ -9,6 +10,7 @@ from .lexer import Lexer
 bytecodeprinter = ByteCodePrinter()
 astprinter = ASTPrinter()
 evaluator = Evaluator()
+formatter = Formatter()
 vm = VirtualMachine()
 compiler = Compiler()
 parser = Parser()
@@ -29,10 +31,11 @@ def _run(expr: str):
         bytecode = compiler.compile(ast)
         print(f"BYTECODE: {bytecode!r}")
         print("INSTRUCTIONS:")
-        bytecodeprinter.print(bytecode)
+        bytecodeprinter.print(bytecode, indent='  ')
         print()
         e_result = evaluator.eval(ast)
         v_result = vm.execute(bytecode)
+        print(f"Expression: {formatter.format(ast)!r}")
         print(f"EvaluatorResult: {e_result!r}")
         print(f"VirtualMachineResult: {v_result!r}")
     except ParserError as e:

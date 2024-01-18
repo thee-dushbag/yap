@@ -19,23 +19,23 @@ class Parser:
 
     def minus(self):
         left = self.plus()
-        if self.peektype() == TokenType.MINUS:
+        while self.peektype() == TokenType.MINUS:
             operator = self.advance()
-            return nodes.Minus(left, operator, self.minus())
+            left = nodes.Minus(left, operator, self.plus())
         return left
 
     def plus(self):
         left = self.star()
-        if self.peektype() == TokenType.PLUS:
+        while self.peektype() == TokenType.PLUS:
             operator = self.advance()
-            return nodes.Plus(left, operator, self.plus())
+            left = nodes.Plus(left, operator, self.star())
         return left
 
     def star(self):
         left = self.slash()
-        if self.peektype() == TokenType.STAR:
+        while self.peektype() == TokenType.STAR:
             operator = self.advance()
-            return nodes.Star(left, operator, self.star())
+            left = nodes.Star(left, operator, self.slash())
         return left
 
     def slash(self):
