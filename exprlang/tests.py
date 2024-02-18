@@ -128,7 +128,7 @@ def test_compiler():
         Instruction.EOS,
     ]
 
-    bytecode = bytes([*consts, *program])
+    bytecode = bytes(consts + program)
     compiler = Compiler()
     ast = _genast(expr)
     gen_bytecode = compiler.compile(ast)

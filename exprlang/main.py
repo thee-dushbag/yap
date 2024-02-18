@@ -10,27 +10,27 @@ class ExprEvaluator:
     # Facade to abstract away all the complexity.
     def __init__(self) -> None:
         self._vm = _VirtualMachine()
-        self._eval = _Evaluator()
-        self._format = _Formatter()
-        self._comp = _Compiler()
-        self._pars = _Parser()
-        self._lex = _Lexer()
+        self._formatter = _Formatter()
+        self._evaluator = _Evaluator()
+        self._compiler = _Compiler()
+        self._parser = _Parser()
+        self._lexer = _Lexer()
 
     def _genast(self, expr: str):
-        tokens = self._lex.scan(expr)
-        return self._pars.parse(tokens)
+        tokens = self._lexer.scan(expr)
+        return self._parser.parse(tokens)
 
     def format(self, expr: str) -> str:
         ast = self._genast(expr)
-        return self._format.format(ast)
+        return self._formatter.format(ast)
 
     def eval(self, expr: str):
         ast = self._genast(expr)
-        return self._eval.eval(ast)
+        return self._evaluator.eval(ast)
 
     def exec(self, bytecode: bytes):
         return self._vm.execute(bytecode)
 
     def compile(self, expr: str):
         ast = self._genast(expr)
-        return self._comp.compile(ast)
+        return self._compiler.compile(ast)

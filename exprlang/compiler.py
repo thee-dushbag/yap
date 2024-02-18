@@ -87,4 +87,4 @@ class Compiler(Visitor):
         self.push(Instruction.EOS)
         program = bytes(self._buffer)
         cosnts = self.serialize_consts()
-        return bytes([*cosnts, *program])
+        return cosnts + program

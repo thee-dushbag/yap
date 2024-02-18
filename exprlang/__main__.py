@@ -31,7 +31,7 @@ def _run(expr: str):
         bytecode = compiler.compile(ast)
         print(f"BYTECODE: {bytecode!r}")
         print("INSTRUCTIONS:")
-        bytecodeprinter.print(bytecode, indent='  ')
+        bytecodeprinter.print(bytecode, indent="  ")
         print()
         e_result = evaluator.eval(ast)
         v_result = vm.execute(bytecode)
@@ -46,14 +46,28 @@ def _run(expr: str):
         print(f"ZeroDivisionError: {str(e)}")
 
 
+HELP = """
+Enter:
+  clear | c                               :To clear the screen
+  help | h | ?                            :To display this message
+  exit | quit | bye | <press> ctrl-c | q  :To exit the application
+""".lstrip()
+
+
 def main():
-    print("Enter exit, quit, bye, q or press ctrl-c to exit.")
+    print("Enter 'help' for usage help.")
     while True:
-        expr = input("> ")
-        if expr in ("exit", "q", "quit", "bye"):
-            break
-        _run(expr)
-        print()
+        expr = input("> ").strip()
+        match expr:
+            case "exit" | "q" | "quit" | "bye":
+                break
+            case "clear" | "clr" | "c":
+                print("\033[H\033[2J\033[3J")
+            case "help" | "h" | "?":
+                print(HELP)
+            case _:
+                _run(expr)
+                print()
 
 
 if __name__ == "__main__":

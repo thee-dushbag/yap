@@ -8,7 +8,7 @@ class VirtualMachine:
         self._constants: list[int | float] = []
         self._stop = len(self._bytecode)
         self._current = 0
-        self._stack = []
+        self._stack: list[float] = []
         self.push = self._stack.append
         self.pop = self._stack.pop
 

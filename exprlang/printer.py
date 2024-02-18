@@ -25,7 +25,7 @@ class ByteCodePrinter:
         self._bytecode = bytecode or b""
         self._stop = len(self._bytecode)
         self._current = 0
-        self._instructions = []
+        self._instructions: list[str] = []
         self.push = self._instructions.append
 
     reset = __init__
@@ -110,7 +110,7 @@ class ByteCodePrinter:
 
 class ASTPrinter(Visitor):
     def __init__(self) -> None:
-        self._lines = defaultdict(lambda: "")
+        self._lines: dict[int, str] = defaultdict(lambda: "")
         self._column = 0
         self._line = 0
 

@@ -25,9 +25,11 @@ class Token:
 
     __repr__ = __str__
 
-    def __eq__(self, token: "Token") -> bool:
-        return (
-            self.type == token.type
-            and self.lexeme == token.lexeme
-            and self.column == token.column
-        )
+    def __eq__(self, token: object):
+        if isinstance(token, Token):
+            return (
+                self.type == token.type
+                and self.lexeme == token.lexeme
+                and self.column == token.column
+            )
+        return NotImplemented

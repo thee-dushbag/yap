@@ -34,7 +34,7 @@ I would like the project to
 You can also import the project to use alongside your application.
 
 ```python
-from exprlang.main import ExprEvaluator
+from exprlang import ExprEvaluator
 
 expreval = ExprEvaluator()
 
