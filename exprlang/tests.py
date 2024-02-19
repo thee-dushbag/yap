@@ -6,6 +6,24 @@ from .vm import VirtualMachine
 from .parser import Parser
 from .lexer import Lexer
 from . import nodes
+import typing
+
+EXPRESSIONS: typing.Final[list[tuple[str, float | int]]] = [
+    ("0", 0),
+    ("-3", -3),
+    ("---3", -3),
+    ("----3", 3),
+    ("3 + 5", 8),
+    ("4 * 7", 28),
+    ("4 * 7 + 3", 31),
+    ("1024 ^ 0.1", 2),
+    ("5 ^ 2 ^ 0.5", 5),
+    ("9 / 10 / 10", 0.09),
+    ("2 ^ 2 ^ 2 ^ 2", 256),
+    ("2 + 3 - 4 + 5 - 6 + 7", -17),
+    ("11111111 ^ 2", 123456787654321),
+    ("50 - +90 / 7 * 23 ^ (8 + -6)", -47260 / 7),
+]
 
 
 def test_lexer():
@@ -78,18 +96,8 @@ def test_evaluator():
     def _genast(expr: str) -> nodes.Expression:
         return deps[1].parse(deps[0].scan(expr))
 
-    exprs = (
-        ("-3", -3),
-        ("3 + 5", 8),
-        ("4 * 7", 28),
-        ("4 * 7 + 3", 31),
-        ("2 ^ 2 ^ 2", 16),
-        ("5 ^ 2 ^ 0.5", 5),
-        ("9 / 10 / 10", 0.09),
-        ("50 - +90 / 7 * 23 ^ (8 + -6)", -47260 / 7),
-    )
     evaluator = Evaluator()
-    for expr, ans in exprs:
+    for expr, ans in EXPRESSIONS:
         ast = _genast(expr)
         assert evaluator.eval(ast) == ans
 
@@ -141,23 +149,26 @@ def test_virtual_machine():
     def _genast(expr: str) -> nodes.Expression:
         return deps[1].parse(deps[0].scan(expr))
 
-    exprs = (
-        ("-3", -3),
-        ("3 + 5", 8),
-        ("4 * 7", 28),
-        ("4 * 7 + 3", 31),
-        ("1024 ^ 0.1", 2),
-        ("5 ^ 2 ^ 0.5", 5),
-        ("9 / 10 / 10", 0.09),
-        ("2 ^ 2 ^ 2 ^ 2", 256),
-        ("2 + 3 - 4 + 5 - 6 + 7", -17),
-        ("11111111 ^ 2", 123456787654321),
-        ("50 - +90 / 7 * 23 ^ (8 + -6)", -47260 / 7),
-    )
-
     vm = VirtualMachine()
     compiler = Compiler()
-    for expr, ans in exprs:
+    for expr, ans in EXPRESSIONS:
         ast = _genast(expr)
         bytecode = compiler.compile(ast)
         assert vm.execute(bytecode) == ans
+
+
+def test_equal_results_vm_eval():
+    deps = Lexer(), Parser()
+
+    def genast(expr: str) -> nodes.Expression:
+        return deps[1].parse(deps[0].scan(expr))
+
+    evaluator = Evaluator()
+    vm = VirtualMachine()
+    compiler = Compiler()
+    for expr, _ in EXPRESSIONS:
+        ast = genast(expr)
+        bytecode = compiler.compile(ast)
+        vm_result = vm.execute(bytecode)
+        ev_result = evaluator.eval(ast)
+        assert vm_result == ev_result

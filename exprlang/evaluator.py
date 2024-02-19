@@ -1,42 +1,28 @@
-import typing as ty
-from .nodes import (
-    Expression,
-    Visitor,
-    Binary,
-    Number,
-    UMinus,
-    Group,
-    Power,
-    Minus,
-    Slash,
-    UPlus,
-    Star,
-    Plus,
-)
+from . import nodes
 
 
-class Evaluator(Visitor):
-    def accept_group(self, expr: Group):
+class Evaluator(nodes.Visitor[float | int]):
+    def accept_group(self, expr: nodes.Group):
         return expr.right.accept(self)
 
-    def _binlr(self, expr: Binary) -> tuple[ty.Any, ty.Any]:
+    def _binlr(self, expr: nodes.Binary):
         left = expr.left.accept(self)
         right = expr.right.accept(self)
         return left, right
 
-    def accept_minus(self, expr: Minus):
+    def accept_minus(self, expr: nodes.Minus):
         left, right = self._binlr(expr)
         return left - right
 
-    def accept_number(self, expr: Number) -> ty.Any:
+    def accept_number(self, expr: nodes.Number):
         type = float if "." in expr.token.lexeme else int
         return type(expr.token.lexeme)
 
-    def accept_plus(self, expr: Plus) -> ty.Any:
+    def accept_plus(self, expr: nodes.Plus):
         left, right = self._binlr(expr)
         return left + right
 
-    def accept_slash(self, expr: Slash) -> ty.Any:
+    def accept_slash(self, expr: nodes.Slash):
         left, right = self._binlr(expr)
         if right == 0:
             raise ZeroDivisionError(
@@ -44,21 +30,21 @@ class Evaluator(Visitor):
             )
         return left / right
 
-    def accept_power(self, expr: Power) -> ty.Any:
+    def accept_power(self, expr: nodes.Power):
         left, right = self._binlr(expr)
         return left**right
 
-    def accept_star(self, expr: Star) -> ty.Any:
+    def accept_star(self, expr: nodes.Star):
         left, right = self._binlr(expr)
         return left * right
 
-    def accept_uminus(self, expr: UMinus) -> ty.Any:
+    def accept_uminus(self, expr: nodes.UMinus):
         right = expr.right.accept(self)
         return -right
 
-    def accept_uplus(self, expr: UPlus) -> ty.Any:
+    def accept_uplus(self, expr: nodes.UPlus):
         right = expr.right.accept(self)
         return +right
 
-    def eval(self, root: Expression) -> ty.Any:
+    def eval(self, root: nodes.Expression):
         return root.accept(self)

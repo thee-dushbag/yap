@@ -1,22 +1,7 @@
-from exprlang.nodes import Group, Minus, Number, Plus, Power, Slash, Star, UMinus, UPlus
 from .instructions import Instruction
 from .exc import UnknownInstruction
 from collections import defaultdict
-from .nodes import (
-    Expression,
-    Visitor,
-    Number,
-    UMinus,
-    Minus,
-    Slash,
-    Power,
-    UPlus,
-    Group,
-    Plus,
-    Star,
-    Binary,
-    Unary,
-)
+from . import nodes
 
 
 class ByteCodePrinter:
@@ -50,20 +35,13 @@ class ByteCodePrinter:
     def _execute(self):
         while self.peek() != Instruction.EOS:
             match self.peek():
-                case Instruction.ADD:
-                    self.add()
-                case Instruction.SUBTRACT:
-                    self.subtract()
-                case Instruction.MULTIPLY:
-                    self.multiply()
-                case Instruction.DIVIDE:
-                    self.divide()
-                case Instruction.POWER:
-                    self.power()
-                case Instruction.LOAD_CONST:
-                    self.load_const()
-                case unknown:
-                    raise UnknownInstruction(unknown)
+                case Instruction.ADD:        self.add()
+                case Instruction.POWER:      self.power()
+                case Instruction.DIVIDE:     self.divide()
+                case Instruction.MULTIPLY:   self.multiply()
+                case Instruction.SUBTRACT:   self.subtract()
+                case Instruction.LOAD_CONST: self.load_const()
+                case unknown: raise UnknownInstruction(unknown)
         self.advance()
 
     def add(self):
@@ -108,11 +86,11 @@ class ByteCodePrinter:
         print(instructions)
 
 
-class ASTPrinter(Visitor):
+class ASTPrinter(nodes.Visitor[None]):
     def __init__(self) -> None:
         self._lines: dict[int, str] = defaultdict(lambda: "")
-        self._column = 0
-        self._line = 0
+        self._column: int = 0
+        self._line: int = 0
 
     @property
     def indent(self):
@@ -121,7 +99,7 @@ class ASTPrinter(Visitor):
     def advance(self, size: int = 1):
         self._column += size
 
-    def accept_number(self, expr: Number):
+    def accept_number(self, expr: nodes.Number):
         number = self.indent + expr.token.lexeme
         self.advance(len(expr.token.lexeme))
         self.addline(number)
@@ -131,7 +109,7 @@ class ASTPrinter(Visitor):
         current += string[len(current) :]
         self._lines[self._line] = current
 
-    def _accept_binary(self, expr: Binary):
+    def _accept_binary(self, expr: nodes.Binary):
         head = self.indent + expr.operator.lexeme
         self.addline(head)
         self._line += 1
@@ -140,44 +118,44 @@ class ASTPrinter(Visitor):
         expr.right.accept(self)
         self._line -= 1
 
-    def _accept_unary(self, expr: Unary):
+    def _accept_unary(self, expr: nodes.Unary):
         head = self.indent + expr.operator.lexeme
         self.addline(head)
         self._line += 1
         expr.right.accept(self)
         self._line -= 1
 
-    def accept_plus(self, expr: Plus):
+    def accept_plus(self, expr: nodes.Plus):
         return self._accept_binary(expr)
 
-    def accept_minus(self, expr: Minus):
+    def accept_minus(self, expr: nodes.Minus):
         return self._accept_binary(expr)
 
-    def accept_power(self, expr: Power):
+    def accept_power(self, expr: nodes.Power):
         return self._accept_binary(expr)
 
-    def accept_slash(self, expr: Slash):
+    def accept_slash(self, expr: nodes.Slash):
         return self._accept_binary(expr)
 
-    def accept_star(self, expr: Star):
+    def accept_star(self, expr: nodes.Star):
         return self._accept_binary(expr)
 
-    def accept_group(self, expr: Group):
+    def accept_group(self, expr: nodes.Group):
         return expr.right.accept(self)
 
-    def accept_uminus(self, expr: UMinus):
+    def accept_uminus(self, expr: nodes.UMinus):
         return self._accept_unary(expr)
 
-    def accept_uplus(self, expr: UPlus):
+    def accept_uplus(self, expr: nodes.UPlus):
         return self._accept_unary(expr)
 
     reset = __init__
 
-    def join(self, root: Expression):
+    def join(self, root: nodes.Expression):
         self.reset()
         root.accept(self)
         lines = (self._lines[l] for l in sorted(self._lines))
         return "\n".join(lines)
 
-    def print(self, root: Expression):
+    def print(self, root: nodes.Expression):
         print(self.join(root))

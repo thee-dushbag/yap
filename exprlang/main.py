@@ -7,7 +7,7 @@ from .lexer import Lexer as _Lexer
 
 
 class ExprEvaluator:
-    # Facade to abstract away all the complexity.
+    # Facade to abstract away all the madness.
     def __init__(self) -> None:
         self._vm = _VirtualMachine()
         self._formatter = _Formatter()

@@ -1,58 +1,44 @@
-from .nodes import (
-    Expression,
-    Visitor,
-    Binary,
-    Number,
-    UMinus,
-    Unary,
-    Group,
-    Power,
-    Minus,
-    Slash,
-    UPlus,
-    Star,
-    Plus,
-)
+from . import nodes
 
 
-class Formatter(Visitor):
-    def accept_number(self, expr: Number) -> str:
+class Formatter(nodes.Visitor[str]):
+    def accept_number(self, expr: nodes.Number):
         return expr.token.lexeme
 
-    def _lint_binary(self, expr: Binary) -> str:
+    def _lint_binary(self, expr: nodes.Binary):
         left: str = expr.left.accept(self)
         right: str = expr.right.accept(self)
         op: str = expr.operator.lexeme
         return f"{left} {op} {right}"
 
-    def _lint_unary(self, expr: Unary) -> str:
+    def _lint_unary(self, expr: nodes.Unary):
         right: str = expr.right.accept(self)
         op: str = expr.operator.lexeme
         return f"{op}{right}"
 
-    def accept_plus(self, expr: Plus) -> str:
+    def accept_plus(self, expr: nodes.Plus):
         return self._lint_binary(expr)
 
-    def accept_group(self, expr: Group) -> str:
+    def accept_group(self, expr: nodes.Group):
         return "(" + expr.right.accept(self) + ")"
 
-    def accept_minus(self, expr: Minus) -> str:
+    def accept_minus(self, expr: nodes.Minus):
         return self._lint_binary(expr)
 
-    def accept_power(self, expr: Power) -> str:
+    def accept_power(self, expr: nodes.Power):
         return self._lint_binary(expr)
 
-    def accept_slash(self, expr: Slash) -> str:
+    def accept_slash(self, expr: nodes.Slash):
         return self._lint_binary(expr)
 
-    def accept_star(self, expr: Star) -> str:
+    def accept_star(self, expr: nodes.Star):
         return self._lint_binary(expr)
 
-    def accept_uminus(self, expr: UMinus) -> str:
+    def accept_uminus(self, expr: nodes.UMinus):
         return self._lint_unary(expr)
 
-    def accept_uplus(self, expr: UPlus) -> str:
+    def accept_uplus(self, expr: nodes.UPlus):
         return self._lint_unary(expr)
 
-    def format(self, root: Expression) -> str:
+    def format(self, root: nodes.Expression):
         return root.accept(self)

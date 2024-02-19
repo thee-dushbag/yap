@@ -31,8 +31,7 @@ class Lexer:
         self.advance()
         if type is not None:
             self.consume_token(type)
-        else:
-            self.consume()
+        self.consume()
 
     def empty(self):
         return self._current >= self._stop
@@ -45,31 +44,21 @@ class Lexer:
     def _scan(self):
         while not self.empty():
             match self.peek():
-                case " ":
-                    self.consume_char()
-                case "*":
-                    self.consume_char(TokenType.STAR)
-                case "-":
-                    self.consume_char(TokenType.MINUS)
-                case "+":
-                    self.consume_char(TokenType.PLUS)
-                case "(":
-                    self.consume_char(TokenType.LEFT)
-                case ")":
-                    self.consume_char(TokenType.RIGHT)
-                case "^":
-                    self.consume_char(TokenType.POWER)
-                case "/":
-                    self.consume_char(TokenType.SLASH)
-                case ".":
-                    self.consume_char(TokenType.DOT)
+                case " ": self.consume_char()
+                case "*": self.consume_char(TokenType.STAR)
+                case "-": self.consume_char(TokenType.MINUS)
+                case "+": self.consume_char(TokenType.PLUS)
+                case "(": self.consume_char(TokenType.LEFT)
+                case ")": self.consume_char(TokenType.RIGHT)
+                case "^": self.consume_char(TokenType.POWER)
+                case "/": self.consume_char(TokenType.SLASH)
+                case ".": self.consume_char(TokenType.DOT)
                 case char:
                     if char.isdigit():
                         self.consume_number()
-                    else:
-                        raise LexerError(
-                            f"Unexpected character: {char!r} in column {self._current}"
-                        )
+                    else: raise LexerError(
+                        f"Unexpected character: {char!r} in column {self._current}"
+                    )
 
     def consume_number(self):
         while self.peek().isdigit():

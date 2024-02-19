@@ -7,10 +7,10 @@ class VirtualMachine:
         self._bytecode = bytecode or [Instruction.EOS, Instruction.EOS]
         self._constants: list[int | float] = []
         self._stop = len(self._bytecode)
-        self._current = 0
         self._stack: list[float] = []
+        self.pop = lambda: self._stack.pop()
         self.push = self._stack.append
-        self.pop = self._stack.pop
+        self._current = 0
 
     reset = __init__
 
@@ -32,20 +32,13 @@ class VirtualMachine:
     def _execute(self):
         while self.peek() != Instruction.EOS:
             match self.peek():
-                case Instruction.ADD:
-                    self.add()
-                case Instruction.SUBTRACT:
-                    self.subtract()
-                case Instruction.MULTIPLY:
-                    self.multiply()
-                case Instruction.DIVIDE:
-                    self.divide()
-                case Instruction.POWER:
-                    self.power()
-                case Instruction.LOAD_CONST:
-                    self.load_const()
-                case unknown:
-                    raise UnknownInstruction(unknown)
+                case Instruction.ADD:        self.add()
+                case Instruction.POWER:      self.power()
+                case Instruction.DIVIDE:     self.divide()
+                case Instruction.MULTIPLY:   self.multiply()
+                case Instruction.SUBTRACT:   self.subtract()
+                case Instruction.LOAD_CONST: self.load_const()
+                case unknown: raise UnknownInstruction(unknown)
         self.advance()
 
     def peek(self) -> int:

@@ -39,7 +39,7 @@ from exprlang import ExprEvaluator
 expreval = ExprEvaluator()
 
 expr = "5*3+4/2-10"
-linted_expr = expreval.format(expr)
+linted_expr = expreval.format(expr)  # Format the expression.
 print(f"Expression: {linted_expr!r}")
 # Expression: '5 * 3 + 4 / 2 - 10'
 
@@ -56,7 +56,7 @@ vm_result = expreval.exec(bytecode)
 print(f"VmResult: {vm_result}")
 # VmResult: 7.0
 
-# There should be no errors here.
+# Should yield same results
 assert vm_result == result
 ```
 
