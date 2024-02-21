@@ -25,7 +25,7 @@ class Token:
 
     __repr__ = __str__
 
-    def __eq__(self, token: object):
+    def __eq__(self, token: object) -> bool:
         return isinstance(token, Token) and (
             self.type == token.type
             and self.lexeme == token.lexeme
