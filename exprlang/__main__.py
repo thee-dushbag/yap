@@ -48,9 +48,9 @@ def _run(expr: str):
 
 HELP = """
 Enter:
-  clear | c                               :To clear the screen
-  help | h | ?                            :To display this message
-  exit | quit | bye | <press> ctrl-c | q  :To exit the application
+  clear | c                                :To clear the screen
+  help  | h    | ?                         :To display this message
+  exit  | quit | bye | <press> ctrl+c | q  :To exit the application
 """.lstrip()
 
 

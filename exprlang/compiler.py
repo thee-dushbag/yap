@@ -63,11 +63,10 @@ class Compiler(nodes.Visitor[None]):
         self.push(Instruction.ADD)
 
     def serialize_consts(self):
-        constants = []
-        for constant in self._constants:
-            constants.extend(constant)
-        constants.append(Instruction.EOS)
-        return bytes(constants)
+        from itertools import chain
+
+        constants = chain.from_iterable(self._constants)
+        return bytes(chain(constants, (Instruction.EOS,)))
 
     def compile(self, root: nodes.Expression):
         self.reset()
